@@ -18,7 +18,11 @@ module.exports = {
         surface: 'hsla(var(--color-surface) / <alpha-value>)',
         primary: 'hsla(var(--color-primary) / <alpha-value>)',
         contrast: 'hsla(var(--color-contrast) / <alpha-value>)',
-        secondary: 'hsla(var(--color-secondary) / <alpha-value>)'
+        secondary: 'hsla(var(--color-secondary) / <alpha-value>)',
+        domaineRed: '#ff0000',
+        domaineBlack: '#111111',
+        domaineBlue: '#0A4874'
+
       },
       transitionTimingFunction: {
         wiggle: 'cubic-bezier(0.22, 1, 0.36, 1)'

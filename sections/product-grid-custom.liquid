@@ -1,0 +1,101 @@
+{% liquid
+  assign collection = collections[section.settings.collection]
+  assign products_to_show = section.settings.products_limit
+%}
+
+<div class="my-3 {% if section.settings.use_container %}max-w-[1400px] mx-auto px-4{% endif %}">
+  
+  <div class="
+    grid
+    gap-{{ section.settings.gap }}
+    {% case section.settings.mobile_columns %}
+      {% when '1' %} grid-cols-1
+      {% when '2' %} grid-cols-2
+    {% endcase %}
+    {% case section.settings.desktop_columns %}
+      {% when '3' %} lg:grid-cols-3
+      {% when '4' %} lg:grid-cols-4
+      {% when '5' %} lg:grid-cols-5
+    {% endcase %}
+  ">
+
+    {% if collection and collection.products.size > 0 %}
+      
+      {% for product in collection.products limit: products_to_show %}
+        {% render 'card-product-new', product: product %}
+      {% endfor %}
+
+    {% else %}
+      <div class="col-span-full text-center py-10 text-gray-500">
+        Nenhum produto encontrado
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Grid Custom",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Quantidade de produtos",
+      "min": 2,
+      "max": 50,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "Colunas no mobile",
+      "options": [
+        { "value": "1", "label": "1 coluna" },
+        { "value": "2", "label": "2 colunas" }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "select",
+      "id": "desktop_columns",
+      "label": "Colunas no desktop",
+      "options": [
+        { "value": "3", "label": "3 colunas" },
+        { "value": "4", "label": "4 colunas" },
+        { "value": "5", "label": "5 colunas" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "select",
+      "id": "gap",
+      "label": "Espaçamento entre cards",
+      "options": [
+        { "value": "2", "label": "Pequeno" },
+        { "value": "4", "label": "Médio" },
+        { "value": "6", "label": "Grande" },
+        { "value": "8", "label": "Extra grande" }
+      ],
+      "default": "6"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_container",
+      "label": "Usar container (centralizado)",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Grid Custom"
+    }
+  ]
+}
+{% endschema %}
