@@ -1,4 +1,8 @@
-<div class="product-card relative" data-product>
+<div class="product-card relative"
+  data-product
+  data-variants='{{ product.variants | json }}'
+  data-images='{{ product.images | json }}'
+>
     {% assign on_sale = false %}
     {% if product.compare_at_price > product.price %}
         {% assign on_sale = true %}
@@ -23,6 +27,7 @@
     {% if product.images.size > 1 %}
       <img
         src="{{ product.images[1] | image_url: width: 315, height: 340 }}"
+        data-hover-image
         class="absolute inset-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       />
     {% endif %}
@@ -76,9 +81,19 @@
 <script>
   document.querySelectorAll('[data-product]').forEach(card => {
     const mainImage = card.querySelector('[data-main-image]');
+    const hoverImage = card.querySelector('[data-hover-image]');
     const swatches = card.querySelectorAll('[data-swatch]');
 
-    const variants = {{ product.variants | json }};
+    const variants = JSON.parse(card.dataset.variants);
+    const images = JSON.parse(card.dataset.images);
+
+    const width = mainImage.dataset.width;
+    const height = mainImage.dataset.height;
+
+    function buildImageUrl(src) {
+      const cleanSrc = src.split('?')[0];
+      return `${cleanSrc}?width=${width}&height=${height}&crop=center`;
+    }
 
     function setActiveSwatch(activeBtn) {
       swatches.forEach(btn => {
@@ -88,39 +103,39 @@
 
       activeBtn.classList.remove('ring-transparent');
       activeBtn.classList.add('ring-domaineBlue');
+
     }
 
-    function buildImageUrl(src, width, height) {
-        const cleanSrc = src.split('?')[0];
-        return `${cleanSrc}?width=${width}&height=${height}&crop=center`;
-    }
-
-    const width = mainImage.dataset.width;
-    const height = mainImage.dataset.height;
-
-    function updateImage(color) {
+    function updateImages(color) {
       const variant = variants.find(v => v.option1 === color);
-        mainImage.src = buildImageUrl(
-            variant.featured_image.src,
-            width,
-            height
-        );
+      if (!variant) return;
+
+      if (variant.featured_image?.src) {
+        mainImage.src = buildImageUrl(variant.featured_image.src);
+      }
+
+      if (hoverImage && variant.featured_image?.position) {
+        const index = variant.featured_image.position - 1;
+        const nextImage = images[index + 1];
+
+        if (nextImage) {
+          hoverImage.src = buildImageUrl(nextImage);
+        } else {
+          hoverImage.src = mainImage.src;
+        }
+      }
     }
 
     if (swatches.length > 0) {
-      const firstSwatch = swatches[0];
-      const firstColor = firstSwatch.dataset.color;
-
-      setActiveSwatch(firstSwatch);
-      updateImage(firstColor);
+      const first = swatches[0];
+      setActiveSwatch(first);
+      updateImages(first.dataset.color);
     }
 
     swatches.forEach(btn => {
       btn.addEventListener('click', () => {
-        const color = btn.dataset.color;
-
         setActiveSwatch(btn);
-        updateImage(color);
+        updateImages(btn.dataset.color);
       });
     });
   });
