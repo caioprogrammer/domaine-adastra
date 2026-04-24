@@ -35,7 +35,7 @@
   </div>
 
   <!-- Swatches -->
-    <div class="flex gap-2 min-h-6 mt-3">
+    <div class="flex gap-2 flex-wrap min-h-6 mt-3">
         {% for option in product.options_with_values %}
             {% if option.name == 'Cor' %}
             {% for value in option.values %}
