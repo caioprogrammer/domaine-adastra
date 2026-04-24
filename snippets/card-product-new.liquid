@@ -5,7 +5,8 @@
     {% endif %}
 
   <div class="relative group overflow-hidden border rounded-[10px] border-[#E8E8E8]">
-    {% if on_sale %}
+    <a href="{{ product.url }}">
+      {% if on_sale %}
       <span class="absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10">
         On Sale!
       </span>
@@ -25,6 +26,7 @@
         class="absolute inset-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       />
     {% endif %}
+    </a>
   </div>
 
   <!-- Swatches -->
@@ -52,7 +54,11 @@
       <p class="text-sm text-domaineBlack">{{ product.vendor }}</p>
     {% endif %}
 
-    <h3 class="text-base font-medium text-domaineBlue">{{ product.title }}</h3>
+    <h3 class="text-base font-medium text-domaineBlue">
+      <a href="{{ product.url }}">
+        {{ product.title }}
+      </a>
+    </h3>
 
     <div class="flex text-sm items-center gap-2">
         {% if on_sale %}
