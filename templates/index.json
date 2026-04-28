@@ -14,8 +14,22 @@
       "name": "Product Grid Custom",
       "settings": {
         "collection": "grid-home",
+        "card_type": "tailwind",
         "products_limit": 8,
         "mobile_columns": "2",
+        "desktop_columns": "4",
+        "gap": "6",
+        "use_container": true
+      }
+    },
+    "product_grid_custom_KxfyNa": {
+      "type": "product-grid-custom",
+      "name": "Product Grid Custom",
+      "settings": {
+        "collection": "grid-home",
+        "card_type": "alpine",
+        "products_limit": 8,
+        "mobile_columns": "1",
         "desktop_columns": "4",
         "gap": "6",
         "use_container": true
@@ -23,6 +37,7 @@
     }
   },
   "order": [
-    "product_grid_custom_pFMzCY"
+    "product_grid_custom_pFMzCY",
+    "product_grid_custom_KxfyNa"
   ]
 }
