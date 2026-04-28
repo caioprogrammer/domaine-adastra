@@ -1,142 +1,58 @@
-<div class="product-card relative"
-  data-product
-  data-variants='{{ product.variants | json }}'
-  data-images='{{ product.images | json }}'
->
-    {% assign on_sale = false %}
-    {% if product.compare_at_price > product.price %}
-        {% assign on_sale = true %}
-    {% endif %}
+<div class="product-card relative flex flex-col" data-product-id="{{ product.id }}">
+  {%- assign current_variant = product.selected_or_first_available_variant -%}
+  
+  {% comment %} Wrapper da Imagem {% endcomment %}
+  <a 
+    href="{{ product.url }}?variant={{ current_variant.id }}" 
+    class="group mb-4 border border-[#e8e8e8] product-card-link relative block overflow-hidden rounded-[10px]">
+    <img 
+      src="{{ current_variant.featured_image | image_url: width: 315, height: 340 }}" 
+      alt="{{ current_variant.title }}" 
+      class="main-image h-full w-full object-cover object-center transition-opacity duration-500"
+      data-main-image>
+    
+    {%- assign next_image_index = current_variant.featured_image.position -%}
+    <img 
+      src="{{ product.images[next_image_index] | image_url: width: 315, height: 340 }}" 
+      alt="{{ current_variant.title }}" 
+      class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+      data-hover-image>
+  </a>
 
-  <div class="relative group overflow-hidden border rounded-[10px] border-[#E8E8E8]">
-    <a href="{{ product.url }}">
-      {% if on_sale %}
-      <span class="absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10">
-        On Sale!
-      </span>
-    {% endif %}
-
-    <img
-      src="{{ product.featured_image | image_url: width: 315, height: 340 }}"
-      data-main-image
-      data-width="315"
-      data-height="340"
-      class="w-full transition-opacity duration-300 {% if product.images.size > 1 %}group-hover:opacity-0 {% endif %}"
-    />
-
-    {% if product.images.size > 1 %}
-      <img
-        src="{{ product.images[1] | image_url: width: 315, height: 340 }}"
-        data-hover-image
-        class="absolute inset-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      />
-    {% endif %}
-    </a>
-  </div>
-
-  <!-- Swatches -->
-    <div class="flex gap-2 flex-wrap min-h-6 mt-3">
-        {% for option in product.options_with_values %}
-            {% if option.name == 'Cor' %}
-            {% for value in option.values %}
-                <button
-                class="w-6 h-6 rounded-full border border-transparent ring-1 ring-transparent p-0 flex items-center justify-center"
-                data-swatch
-                data-color="{{ value }}"
-                >
-                <span
-                    class="w-full h-full rounded-full"
-                    style="background-color: {{ value | downcase }}"
-                ></span>
-                </button>
-            {% endfor %}
-            {% endif %}
-        {% endfor %}
+  {% comment %} Informações do Produto {% endcomment %}
+   <div class="flex mb-4 items-center gap-2">
+      {% for variant in product.variants %}
+        <button 
+          type="button"
+          class="swatch-item p-0 h-6 w-6 rounded-full ring-offset-1 transition-all focus:outline-none 
+                 {% if forloop.first %}ring-1 ring-domaineBlue active-swatch{% endif %}" 
+          style="background-color: {{ variant.options[0] | handle }};"
+          data-variant-id="{{ variant.id }}"
+          data-variant-url="{{ product.url }}?variant={{ variant.id }}"
+          data-main-img="{{ variant.featured_image | img_url: '600x' }}"
+          data-hover-img="{{ product.images[variant.featured_image.position] | image_url: width: 315, height: 340 }}"
+          data-price="{{ variant.price | money }}"
+          data-compare="{{ variant.compare_at_price | money }}"
+          data-title="{{ product.title }} - {{ variant.title }}"
+          aria-label="{{ variant.title }}">
+        </button>
+      {% endfor %}
     </div>
-
-  <div class="mt-3">
-    {% if product.vendor %}
-      <p class="text-sm text-domaineBlack">{{ product.vendor }}</p>
-    {% endif %}
-
-    <h3 class="text-base font-medium text-domaineBlue">
-      <a href="{{ product.url }}">
-        {{ product.title }}
-      </a>
+  <div class="flex flex-col">
+    <span class="text-sm text-domaineBlack">
+      {{ product.vendor }}
+    </span>
+    <h3 class="text-base font-medium text-domaineBlue product-title">
+      {{ product.title }}
     </h3>
-
-    <div class="flex text-sm items-center gap-2">
-        {% if on_sale %}
-            <span class="line-through text-domaineBlack">
-            {{ product.compare_at_price | money }}
-            </span>
-        {% endif %}
-        <span class="{% if on_sale %}text-domaineRed{% else %}text-domaineBlack{% endif %} font-medium">
-            {{ product.price | money }}
-        </span>
+    
+    <div class="flex items-center gap-2">
+      <span class="price-compare text-sm text-domaineBlack line-through">
+        {{ current_variant.compare_at_price | money }}
+      </span>
+      <span class="text-sm text-domaineRed price-regular">
+        {{ current_variant.price | money }}
+      </span>
     </div>
   </div>
 </div>
-
-<script>
-  document.querySelectorAll('[data-product]').forEach(card => {
-    const mainImage = card.querySelector('[data-main-image]');
-    const hoverImage = card.querySelector('[data-hover-image]');
-    const swatches = card.querySelectorAll('[data-swatch]');
-
-    const variants = JSON.parse(card.dataset.variants);
-    const images = JSON.parse(card.dataset.images);
-
-    const width = mainImage.dataset.width;
-    const height = mainImage.dataset.height;
-
-    function buildImageUrl(src) {
-      const cleanSrc = src.split('?')[0];
-      return `${cleanSrc}?width=${width}&height=${height}&crop=center`;
-    }
-
-    function setActiveSwatch(activeBtn) {
-      swatches.forEach(btn => {
-        btn.classList.remove('ring-domaineBlue');
-        btn.classList.add('ring-transparent');
-      });
-
-      activeBtn.classList.remove('ring-transparent');
-      activeBtn.classList.add('ring-domaineBlue');
-
-    }
-
-    function updateImages(color) {
-      const variant = variants.find(v => v.option1 === color);
-      if (!variant) return;
-
-      if (variant.featured_image?.src) {
-        mainImage.src = buildImageUrl(variant.featured_image.src);
-      }
-
-      if (hoverImage && variant.featured_image?.position) {
-        const index = variant.featured_image.position - 1;
-        const nextImage = images[index + 1];
-
-        if (nextImage) {
-          hoverImage.src = buildImageUrl(nextImage);
-        } else {
-          hoverImage.src = mainImage.src;
-        }
-      }
-    }
-
-    if (swatches.length > 0) {
-      const first = swatches[0];
-      setActiveSwatch(first);
-      updateImages(first.dataset.color);
-    }
-
-    swatches.forEach(btn => {
-      btn.addEventListener('click', () => {
-        setActiveSwatch(btn);
-        updateImages(btn.dataset.color);
-      });
-    });
-  });
-</script>
