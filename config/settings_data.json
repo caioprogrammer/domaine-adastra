@@ -10,6 +10,8 @@
 {
   "current": {
     "colors_surface": "#ffffff",
+    "type_heading": "roboto_n4",
+    "type_body": "roboto_n4",
     "content_for_index": []
   },
   "presets": {
