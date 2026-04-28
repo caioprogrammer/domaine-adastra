@@ -5,6 +5,16 @@
   <a 
     href="{{ product.url }}?variant={{ current_variant.id }}" 
     class="group mb-4 border border-[#e8e8e8] product-card-link relative block overflow-hidden rounded-[10px]">
+    {% assign on_sale = false %}
+    {% if current_variant.compare_at_price > current_variant.price %}
+        {% assign on_sale = true %}
+    {% endif %}
+    {% if on_sale %}
+      <span class="on_sale absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10">
+        On Sale!
+      </span>
+    {% endif %}
+    
     <img 
       src="{{ current_variant.featured_image | image_url: width: 315, height: 340 }}" 
       alt="{{ current_variant.title }}" 
@@ -29,11 +39,11 @@
           style="background-color: {{ variant.options[0] | handle }};"
           data-variant-id="{{ variant.id }}"
           data-variant-url="{{ product.url }}?variant={{ variant.id }}"
-          data-main-img="{{ variant.featured_image | img_url: '600x' }}"
+          data-main-img="{{ variant.featured_image | image_url: width: 315, height: 340 }}"
           data-hover-img="{{ product.images[variant.featured_image.position] | image_url: width: 315, height: 340 }}"
           data-price="{{ variant.price | money }}"
           data-compare="{{ variant.compare_at_price | money }}"
-          data-title="{{ product.title }} - {{ variant.title }}"
+          data-title="{{ product.title }}"
           aria-label="{{ variant.title }}">
         </button>
       {% endfor %}
