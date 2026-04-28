@@ -2,43 +2,49 @@ import ProductForm from '../product-form'
 
 window.customElements.define('product-form', ProductForm)
 
-document.addEventListener('DOMContentLoaded', () => {
-        const swatches = document.querySelectorAll('.swatch-item');
 
-        swatches.forEach(swatch => {
-          swatch.addEventListener('click', function(e) {
-            e.preventDefault();
-            const card = this.closest('.product-card');
+document.addEventListener('click', (e) => {
+    const swatch = e.target.closest('.swatch-item');
+    if (!swatch) return;
 
-            card.querySelectorAll('.swatch-item').forEach(s => {
-              s.classList.remove('ring-1', 'ring-domaineBlue', 'active-swatch');
-            });
-            this.classList.add('ring-1', 'ring-domaineBlue', 'active-swatch');
+    e.preventDefault();
 
-            const newUrl = this.getAttribute('data-variant-url');
-            card.querySelector('.product-card-link').setAttribute('href', newUrl);
+    const card = swatch.closest('[data-product-card]');
+    if (!card) return;
 
-            const mainImg = this.getAttribute('data-main-img');
-            const hoverImg = this.getAttribute('data-hover-img');
-            
-            if (mainImg) card.querySelector('[data-main-image]').src = mainImg;
-            if (hoverImg) card.querySelector('[data-hover-image]').src = hoverImg;
+    // Atualiza classes visuais
+    card.querySelectorAll('.swatch-item').forEach(s => {
+        s.classList.remove('ring-1', 'ring-domaineBlue', 'active-swatch');
+    });
+    swatch.classList.add('ring-1', 'ring-domaineBlue', 'active-swatch');
 
-            card.querySelector('.product-title').innerText = this.getAttribute('data-title');
-            card.querySelector('.price-regular').innerText = this.getAttribute('data-price');
-            
-            const comparePrice = this.getAttribute('data-compare');
-            const price = this.getAttribute('data-price');
-            const compareElem = card.querySelector('.price-compare');
-            
-            if (comparePrice && comparePrice.trim() !== '' && !comparePrice.includes('0,00') && price < comparePrice) {
-              compareElem.innerText = comparePrice;
-              compareElem.classList.remove('hidden');
-              card.querySelector('.on_sale').classList.remove('hidden')
-            } else {
-              compareElem.classList.add('hidden');
-              card.querySelector('.on_sale').classList.add('hidden')
-            }
-          });
-        });
-      });
+    // Seletores de Imagem
+    const mainImg = card.querySelector('[data-main-image]');
+    const hoverImg = card.querySelector('[data-hover-image]'); // O seletor da segunda imagem
+
+    // Lógica de troca de imagens baseada nos datasets
+    if (mainImg && swatch.dataset.mainImg) {
+        mainImg.src = swatch.dataset.mainImg;
+    }
+    
+    // Recupera a função de "position" através do hover-img processado no Liquid
+    if (hoverImg && swatch.dataset.hoverImg) {
+        hoverImg.src = swatch.dataset.hoverImg;
+    }
+
+    // Restante da lógica (Preços e Badge)
+    const priceReg = card.querySelector('.price-regular');
+    const priceComp = card.querySelector('.price-compare');
+    const badge = card.querySelector('.on_sale');
+    const link = card.querySelector('.product-card-link');
+
+    if (priceReg) priceReg.innerText = swatch.dataset.price;
+    if (link) link.href = swatch.dataset.variantUrl;
+
+    const isSale = swatch.dataset.onSale === 'true';
+    if (priceComp) {
+        priceComp.innerText = swatch.dataset.compare;
+        priceComp.classList.toggle('hidden', !isSale);
+    }
+    if (badge) badge.classList.toggle('hidden', !isSale);
+});

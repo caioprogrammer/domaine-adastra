@@ -1,63 +1,68 @@
-<div class="product-card relative flex flex-col" data-product-id="{{ product.id }}">
-  {%- assign current_variant = product.selected_or_first_available_variant -%}
-  
+{%- liquid 
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+-%}
+
+<div class="product-card relative flex flex-col" data-product-card data-product-id="{{ product.id }}">
   {% comment %} Wrapper da Imagem {% endcomment %}
-  <a 
-    href="{{ product.url }}?variant={{ current_variant.id }}" 
-    class="group mb-4 border border-[#e8e8e8] product-card-link relative block overflow-hidden rounded-[10px]">
-    {% assign on_sale = false %}
-    {% if current_variant.compare_at_price > current_variant.price %}
-        {% assign on_sale = true %}
-    {% endif %}
-    {% if on_sale %}
-      <span class="on_sale absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10">
-        On Sale!
-      </span>
-    {% endif %}
+  <a
+    href="{{ product.url }} | within: collection"
+    class="group mb-4 border border-[#e8e8e8] product-card-link relative block overflow-hidden rounded-[10px]"
+    aria-label="{{ product.title }}">
     
-    <img 
-      src="{{ current_variant.featured_image | image_url: width: 315, height: 340 }}" 
-      alt="{{ current_variant.title }}" 
+    <span class="on_sale absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10 {% unless on_sale %}hidden{% endunless %}">
+      {{ 'products.product.on_sale' | t }}
+    </span>
+    
+    <img
+      src="{{ current_variant.featured_image | image_url: width: 315, height: 340 }}"
+      alt="{{ current_variant.featured_image.alt | default: product.title }}"
       class="main-image h-full w-full object-cover object-center transition-opacity duration-500"
+      loading="eager"
       data-main-image>
     
-    {%- assign next_image_index = current_variant.featured_image.position -%}
-    <img 
-      src="{{ product.images[next_image_index] | image_url: width: 315, height: 340 }}" 
-      alt="{{ current_variant.title }}" 
-      class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-      data-hover-image>
+    {%- if product.images[1] -%}
+      <img
+        src="{{ product.images[1] | image_url: width: 315, height: 340 }}"
+        alt="{{ product.images[1].alt | default: product.title }}"
+        class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        loading="lazy"
+        data-hover-image>
+    {%- endif -%}
   </a>
 
-  {% comment %} Informações do Produto {% endcomment %}
-   <div class="flex mb-4 items-center gap-2">
-      {% for variant in product.variants %}
-        <button 
-          type="button"
-          class="swatch-item p-0 h-6 w-6 rounded-full ring-offset-1 transition-all focus:outline-none 
-                 {% if forloop.first %}ring-1 ring-domaineBlue active-swatch{% endif %}" 
-          style="background-color: {{ variant.options[0] | handle }};"
-          data-variant-id="{{ variant.id }}"
-          data-variant-url="{{ product.url }}?variant={{ variant.id }}"
-          data-main-img="{{ variant.featured_image | image_url: width: 315, height: 340 }}"
-          data-hover-img="{{ product.images[variant.featured_image.position] | image_url: width: 315, height: 340 }}"
-          data-price="{{ variant.price | money }}"
-          data-compare="{{ variant.compare_at_price | money }}"
-          data-title="{{ product.title }}"
-          aria-label="{{ variant.title }}">
-        </button>
-      {% endfor %}
-    </div>
+  <div class="flex mb-4 items-center gap-2" data-swatch-container>
+    {% for variant in product.variants %}
+      {%- liquid 
+        assign variant_img = variant.featured_image | default: product.featured_image
+        assign next_index = variant_img.position
+        assign hover_img = product.images[next_index] | default: variant_img
+      -%}
+
+      <button
+        type="button"
+        class="swatch-item p-0 h-6 w-6 rounded-full ring-offset-1 transition-all {% if variant.id == current_variant.id %}ring-1 ring-domaineBlue active-swatch{% endif %}"
+        style="background-color: {{ variant.options[0] | handle }};"
+        data-main-img="{{ variant_img | image_url: width: 315, height: 340 }}"
+        data-hover-img="{{ hover_img | image_url: width: 315, height: 340 }}"
+        data-variant-url="{{ variant.url }}"
+        data-price="{{ variant.price | money }}"
+        data-compare="{{ variant.compare_at_price | money }}"
+        data-on-sale="{% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %}"
+        aria-label="{{ 'products.product.color_swatch' | t }}: {{ variant.options[0] }}">
+      </button>
+    {% endfor %}
+  </div>
+
   <div class="flex flex-col">
-    <span class="text-sm text-domaineBlack">
-      {{ product.vendor }}
-    </span>
-    <h3 class="text-base font-medium text-domaineBlue product-title">
-      {{ product.title }}
-    </h3>
+    <span class="text-sm text-domaineBlack">{{ product.vendor }}</span>
+    <h3 class="text-base font-medium text-domaineBlue product-title">{{ product.title }}</h3>
     
     <div class="flex items-center gap-2">
-      <span class="price-compare text-sm text-domaineBlack line-through">
+      <span class="price-compare text-sm text-domaineBlack line-through {% unless on_sale %}hidden{% endunless %}">
         {{ current_variant.compare_at_price | money }}
       </span>
       <span class="text-sm text-domaineRed price-regular">

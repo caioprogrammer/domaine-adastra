@@ -40,7 +40,9 @@
       "add_to_cart": "Add to cart",
       "sold_out": "Sold out",
       "unavailable": "Unavailable",
-      "product_variants": "Product variants"
+      "product_variants": "Product variants",
+      "on_sale": "On Sale!",
+      "color_swatch": "Color"
     }
   },
   "templates": {
