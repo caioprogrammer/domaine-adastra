@@ -1,0 +1,82 @@
+{%- liquid 
+  assign current_variant = product.selected_or_first_available_variant
+  assign on_sale = false
+  if current_variant.compare_at_price > current_variant.price
+    assign on_sale = true
+  endif
+-%}
+
+<div class="product-card relative flex flex-col" 
+     x-data="{ 
+        mainImage: '{{ current_variant.featured_image | image_url: width: 315, height: 340 }}',
+        hoverImage: '{{ product.images[current_variant.featured_image.position] | image_url: width: 315, height: 340 }}',
+        price: '{{ current_variant.price | money }}',
+        comparePrice: '{{ current_variant.compare_at_price | money }}',
+        onSale: {{ on_sale }},
+        variantUrl: '{{ current_variant.url }}',
+        activeVariantId: {{ current_variant.id }}
+     }">
+
+  {% comment %} Wrapper da Imagem {% endcomment %}
+  <a :href="variantUrl"
+     class="group mb-4 border border-[#e8e8e8] relative block overflow-hidden rounded-[10px]"
+     aria-label="{{ product.title }}">
+    
+    <span class="absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10"
+          x-show="onSale" 
+          x-cloak>
+      {{ 'products.product.on_sale' | t | default: 'On Sale!' }}
+    </span>
+    
+    <img :src="mainImage"
+         alt="{{ product.title }}"
+         class="h-full w-full object-cover object-center transition-opacity duration-500"
+         loading="lazy">
+    
+    <img :src="hoverImage"
+         alt="{{ product.title }}"
+         class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+  </a>
+
+  {% comment %} Swatches {% endcomment %}
+  <div class="flex mb-4 items-center gap-2">
+    {% for variant in product.variants %}
+      {%- liquid 
+        assign v_img = variant.featured_image | default: product.featured_image
+        assign next_idx = v_img.position
+        assign v_hover = product.images[next_idx] | default: v_img
+      -%}
+      <button
+        type="button"
+        @click="
+          mainImage = '{{ v_img | image_url: width: 315, height: 340 }}';
+          hoverImage = '{{ v_hover | image_url: width: 315, height: 340 }}';
+          price = '{{ variant.price | money }}';
+          comparePrice = '{{ variant.compare_at_price | money }}';
+          onSale = {% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %};
+          variantUrl = '{{ variant.url }}';
+          activeVariantId = {{ variant.id }};
+        "
+        class="p-0 h-6 w-6 rounded-full ring-offset-1 transition-all focus:outline-none"
+        :class="activeVariantId === {{ variant.id }} ? 'ring-1 ring-domaineBlue' : ''"
+        style="background-color: {{ variant.options[0] | handle }};"
+        aria-label="{{ 'products.product.color_swatch' | t | default: 'Color' }}: {{ variant.options[0] }}">
+      </button>
+    {% endfor %}
+  </div>
+
+  {% comment %} Info {% endcomment %}
+  <div class="flex flex-col">
+    <span class="text-sm text-domaineBlack">{{ product.vendor }}</span>
+    <h3 class="text-base font-medium text-domaineBlue">{{ product.title }}</h3>
+    
+    <div class="flex items-center gap-2">
+      <span class="text-sm text-domaineBlack line-through" 
+            x-show="onSale" 
+            x-text="comparePrice"
+            x-cloak>
+      </span>
+      <span class="text-sm text-domaineRed" x-text="price"></span>
+    </div>
+  </div>
+</div>

@@ -8,6 +8,9 @@
     "preview": "adastra preview",
     "check": "adastra check"
   },
+  "dependencies": {
+    "alpinejs": "^3.11.1"
+  },
   "devDependencies": {
     "adastra-cli": "latest",
     "adastra-plugin": "latest",

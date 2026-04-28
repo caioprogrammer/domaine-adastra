@@ -1,6 +1,8 @@
 import ProductForm from '../product-form'
+import Alpine from 'alpinejs'
 
 window.customElements.define('product-form', ProductForm)
+Alpine.start()
 
 
 document.addEventListener('click', (e) => {
