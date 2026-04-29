@@ -29,20 +29,24 @@
 
   <a :href="variantUrl"
      class="group mb-4 border border-[#e8e8e8] relative block overflow-hidden rounded-[10px]"
-     aria-label="{{ product.title }}">
-    
-    <span class="absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10"
-          x-show="onSale" 
-          x-cloak>
+     aria-label="{{ product.title }}"
+  >
+    <span 
+      class="absolute top-5 left-5 bg-white border border-domaineRed text-domaineRed text-sm rounded-full px-2 py-1 z-10"   
+      x-show="onSale" 
+      x-cloak
+    >
       {{ 'products.product.on_sale' | t | default: 'On Sale!' }}
     </span>
     
-    <img :src="mainImage"
+    <img 
+      :src="mainImage"
       alt="{{ product.title }}"
       class="h-full w-full object-cover object-center transition-opacity duration-500"
       loading="lazy">
     
-    <img :src="hoverImage"
+    <img 
+      :src="hoverImage"
       alt="{{ product.title }}"
       class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
   </a>
@@ -51,15 +55,15 @@
     <div class="flex mb-4 items-center gap-2">
       {% for variant in product.variants %}
         {%- liquid 
-          assign v_img = variant.featured_image | default: product.featured_image
-          assign v_next_idx = v_img.position
-          assign v_hover = product.images[v_next_idx] | default: v_img
+          assign variant_img = variant.featured_image | default: product.featured_image
+          assign variant_next_idx = variant_img.position
+          assign variant_hover = product.images[variant_next_idx] | default: variant_img
         -%}
         <button
           type="button"
           @click="
-            mainImage = '{{ v_img | image_url: width: 315, height: 340 }}';
-            hoverImage = '{{ v_hover | image_url: width: 315, height: 340 }}';
+            mainImage = '{{ variant_img | image_url: width: 315, height: 340 }}';
+            hoverImage = '{{ variant_hover | image_url: width: 315, height: 340 }}';
             price = '{{ variant.price | money }}';
             comparePrice = '{{ variant.compare_at_price | money }}';
             onSale = {% if variant.compare_at_price > variant.price %}true{% else %}false{% endif %};

@@ -9,7 +9,9 @@ export const initSwatchListener = () => {
         const card = swatch.closest('[data-product-card]');
         if (!card) return;
 
-        card.querySelectorAll('.swatch-item').forEach(s => s.classList.remove('ring-1', 'ring-domaineBlue', 'active-swatch'));
+        card.querySelectorAll('.swatch-item').forEach(
+            s => s.classList.remove('ring-1', 'ring-domaineBlue', 'active-swatch')
+        );
         swatch.classList.add('ring-1', 'ring-domaineBlue', 'active-swatch');
 
         const elements = {
