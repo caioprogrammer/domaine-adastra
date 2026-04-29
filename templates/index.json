@@ -16,7 +16,7 @@
         "collection": "grid-home",
         "card_type": "tailwind",
         "products_limit": 8,
-        "mobile_columns": "2",
+        "mobile_columns": "1",
         "desktop_columns": "4",
         "gap": "6",
         "use_container": true
