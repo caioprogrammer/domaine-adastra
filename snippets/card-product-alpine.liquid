@@ -3,7 +3,7 @@
   
   assign main_img_initial = current_variant.featured_image | default: product.featured_image
   assign next_idx_initial = main_img_initial.position
-  assign hover_img_initial = product.images[next_idx_initial] | default: main_img_initial
+  assign hover_img_initial = product.images[next_idx_initial]
 
   assign on_sale = false
   if current_variant.compare_at_price > current_variant.price
@@ -44,11 +44,12 @@
       alt="{{ product.title }}"
       class="h-full w-full object-cover object-center transition-opacity duration-500"
       loading="lazy">
-    
+    {% if hover_img_initial %}
     <img 
       :src="hoverImage"
       alt="{{ product.title }}"
       class="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+    {% endif %}
   </a>
 
   {% if show_swatches %}

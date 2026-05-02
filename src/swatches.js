@@ -15,6 +15,7 @@ export const initSwatchListener = () => {
         swatch.classList.add('ring-1', 'ring-domaineBlue', 'active-swatch');
 
         const elements = {
+            onSaleBadge: card.querySelector('.on_sale-badge'),
             mainImg: card.querySelector('[data-main-image]'),
             hoverImg: card.querySelector('[data-hover-image]'),
             priceReg: card.querySelector('.price-regular'),
